@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import Login from "./LoginPage";
 import {
     Admin,
     Resource,
@@ -12,7 +13,7 @@ import {
     DateField,
 } from "react-admin";
 import jsonServerProvider from "ra-data-simple-rest";
-import { createTheme, Button, TextField as MuiTextField, Box, Typography, Paper } from "@mui/material";
+import { createTheme, Button, Box, AppBar, Toolbar, Typography, ThemeProvider, CssBaseline } from "@mui/material";
 
 // API URL for backend
 const API_URL = "http://localhost:3000"; // Your API base URL
@@ -116,7 +117,6 @@ const dataProvider = {
         });
     },
 
-    
 };
 
 // User List Resource
@@ -176,83 +176,11 @@ const BlockedPathList = (props) => (
     </ListGuesser>
 );
 
-// Login Page
-const Login = ({ onLoginSuccess }) => {
-    const [email, setEmail] = useState("");
-    const [password, setPassword] = useState("");
-    const [error, setError] = useState("");
-
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-
-        try {
-            const response = await fetch(`${API_URL}/users/login`, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({ email, password }),
-            });
-
-            const data = await response.json();
-
-            if (data.token) {
-                localStorage.setItem("authToken", data.token);
-                onLoginSuccess();
-            } else {
-                setError("Invalid credentials");
-            }
-        } catch (err) {
-            setError("An error occurred while logging in");
-        }
-    };
-
-    return (
-        <Box
-            component="form"
-            onSubmit={handleSubmit}
-            sx={{
-                display: "flex",
-                justifyContent: "center",
-                alignItems: "center",
-                height: "100vh",
-            }}
-        >
-            <Paper sx={{ padding: 3, width: 400 }}>
-                <Typography variant="h5" align="center" gutterBottom>
-                    Login
-                </Typography>
-                <MuiTextField
-                    label="Email"
-                    fullWidth
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    margin="normal"
-                />
-                <MuiTextField
-                    label="Password"
-                    type="password"
-                    fullWidth
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    margin="normal"
-                />
-                {error && (
-                    <Typography color="error" align="center" margin="normal">
-                        {error}
-                    </Typography>
-                )}
-                <Button type="submit" fullWidth variant="contained" color="primary">
-                    Login
-                </Button>
-            </Paper>
-        </Box>
-    );
-};
 
 // Main Admin Page
 const AdminPage = () => {
     const [isAuthenticated, setIsAuthenticated] = useState(!!localStorage.getItem("authToken"));
+    const [darkMode, setDarkMode] = useState(false);
 
     const handleLoginSuccess = () => {
         setIsAuthenticated(true);
@@ -263,25 +191,50 @@ const AdminPage = () => {
         setIsAuthenticated(false);
     };
 
+    const toggleDarkMode = () => {
+        setDarkMode(!darkMode);
+    };
+
+    const theme = createTheme({
+        palette: {
+            mode: darkMode ? "dark" : "light",
+        },
+    });
+
     if (!isAuthenticated) {
         return <Login onLoginSuccess={handleLoginSuccess} />;
     }
 
     return (
-        <Admin
-            dataProvider={dataProvider}
-            theme={createTheme()}
-            logoutButton={
-                <Button variant="contained" color="secondary" onClick={handleLogout}>
-                    Logout
-                </Button>
-            }
-        >
-            <Resource name="users/users" list={UserList} edit={EditGuesser} />
-            <Resource name="shelters/shelters" list={ShelterList} edit={EditGuesser} />
-            <Resource name="resources/resources" list={ResourceList} edit={EditGuesser} />
-            <Resource name="blocked-paths/blocked-paths" list={BlockedPathList} edit={EditGuesser} />
-        </Admin>
+        <ThemeProvider theme={theme}>
+            <CssBaseline />
+
+            {/* Header with Sign-out and Dark Mode Toggle buttons */}
+            <AppBar position="sticky">
+                <Toolbar>
+                    <Typography variant="h6" sx={{ flexGrow: 1 }}>
+                        Admin Dashboard
+                    </Typography>
+                    <Button variant="contained" color="secondary" onClick={handleLogout}>
+                        Logout
+                    </Button>
+                    <Button variant="contained" color="default" onClick={toggleDarkMode} sx={{ marginLeft: 2 }}>
+                        {darkMode ? "Light Mode" : "Dark Mode"}
+                    </Button>
+                </Toolbar>
+            </AppBar>
+
+            {/* Main Admin Section */}
+            <Admin
+                dataProvider={dataProvider}
+                theme={theme}
+            >
+                <Resource name="users/users" list={UserList} edit={EditGuesser} />
+                <Resource name="shelters/shelters" list={ShelterList} edit={EditGuesser} />
+                <Resource name="resources/resources" list={ResourceList} edit={EditGuesser} />
+                <Resource name="blocked-paths/blocked-paths" list={BlockedPathList} edit={EditGuesser} />
+            </Admin>
+        </ThemeProvider>
     );
 };
 

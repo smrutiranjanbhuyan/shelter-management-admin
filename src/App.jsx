@@ -1,5 +1,5 @@
 import React from 'react'
-import AdminPage from './AdminPage'
+import AdminPage from './pages/AdminPage'
 function App() {
   return (
     <div>
