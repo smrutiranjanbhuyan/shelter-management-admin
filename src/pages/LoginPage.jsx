@@ -43,6 +43,8 @@ const Login = ({ onLoginSuccess }) => {
             if (data.user.role === 'admin') {
                 if (data.token) {
                     localStorage.setItem("authToken", data.token);
+                    
+                    localStorage.setItem("userName",data.user.name);
                     onLoginSuccess();
                 } else {
                     setError("Invalid credentials");

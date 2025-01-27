@@ -192,6 +192,7 @@ const AdminPage = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(
     !!localStorage.getItem("authToken")
   );
+
   const [darkMode, setDarkMode] = useState(false);
 
   const handleLoginSuccess = () => {
@@ -222,36 +223,52 @@ const AdminPage = () => {
 
   return (
     <ThemeProvider theme={theme}>
-    <CssBaseline />
+      <CssBaseline />
 
-    {/* Header with Sign-out and Dark Mode Toggle buttons */}
-    <AppBar position="sticky" elevation={3}>
+      {/* Header with Sign-out and Dark Mode Toggle buttons */}
+      <AppBar position="sticky" elevation={3}>
         <Toolbar>
-            <Typography variant="h6" sx={{ flexGrow: 1, fontWeight: 600 }}>
-                Admin Dashboard
-            </Typography>
-            <Tooltip title="Toggle Dark Mode">
-                <IconButton color="inherit" onClick={toggleDarkMode}>
-                    {darkMode ? <Brightness7 /> : <Brightness4 />}
-                </IconButton>
-            </Tooltip>
-            <Tooltip title="Logout">
-                <IconButton color="inherit" onClick={handleLogout}>
-                    <Logout />
-                </IconButton>
-            </Tooltip>
+          <Typography variant="h6" sx={{ flexGrow: 1, fontWeight: 600 }}>
+            Admin Dashboard
+          </Typography>
+
+          <Typography variant="h6" sx={{ flexGrow: 1, fontWeight: 600,color:'#ADD8E6' }}>
+            {localStorage.getItem("userName")}
+          </Typography>
+
+          <Tooltip title="Toggle Dark Mode">
+            <IconButton color="inherit" onClick={toggleDarkMode}>
+              {darkMode ? <Brightness7 /> : <Brightness4 />}
+            </IconButton>
+          </Tooltip>
+          <Tooltip title="Logout">
+            <IconButton color="inherit" onClick={handleLogout}>
+              <Logout />
+            </IconButton>
+          </Tooltip>
         </Toolbar>
-    </AppBar>
+      </AppBar>
 
-    {/* Main Admin Section */}
-    <Admin dataProvider={dataProvider} theme={theme}>
+      {/* Main Admin Section */}
+      <Admin dataProvider={dataProvider} theme={theme}>
         <Resource name="users/users" list={UserList} edit={EditGuesser} />
-        <Resource name="shelters/shelters" list={ShelterList} edit={EditGuesser} />
-        <Resource name="resources/resources" list={ResourceList} edit={EditGuesser} />
-        <Resource name="blocked-paths/blocked-paths" list={BlockedPathList} edit={EditGuesser} />
-    </Admin>
-</ThemeProvider>
-
+        <Resource
+          name="shelters/shelters"
+          list={ShelterList}
+          edit={EditGuesser}
+        />
+        <Resource
+          name="resources/resources"
+          list={ResourceList}
+          edit={EditGuesser}
+        />
+        <Resource
+          name="blocked-paths/blocked-paths"
+          list={BlockedPathList}
+          edit={EditGuesser}
+        />
+      </Admin>
+    </ThemeProvider>
   );
 };
 
